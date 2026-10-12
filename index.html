@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>지역화 전략 Quiz & 학습 웹앱</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+
+  <style>
+    * { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%); }
+    .gradient-text { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .perspective-1000 { perspective: 1000px; }
+    .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+    .card-flipped { transform: rotateY(180deg); }
+    .card-front, .card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 0.75rem; }
+    .card-back { transform: rotateY(180deg); }
+    .fade-in { animation: fadeIn 0.35s ease-in-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-sm transition-all">
+    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="handleHeaderLogoClick()">
+        <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center text-white shadow-md shadow-indigo-200">
+          <i class="fa-solid fa-map-location-dot text-lg"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-slate-900 leading-tight">지역화 전략 Quiz</h1>
+          <p class="text-xs text-slate-500 hidden sm:block">지역브랜드 · 장소마케팅 · 지리적표시제</p>
+        </div>
+      </div>
+
+      <!-- Student Profile Info Badge -->
+      <div id="studentHeaderBadge" class="hidden flex items-center space-x-2 bg-indigo-50 border border-indigo-100 px-3.5 py-1.5 rounded-full">
+        <div class="text-xs sm:text-sm flex items-center gap-1.5">
+          <span class="text-indigo-600 font-bold" id="headerStudentId">1반 1번</span>
+          <span class="text-slate-700 font-bold" id="headerStudentName">홍길동</span>
+          <span id="headerScoreBadge" class="hidden bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-extrabold ml-1 border border-emerald-200">
+            점수: 0점
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6 flex-1 w-full flex flex-col justify-center">
+
+    <!-- LOGIN SCREEN (반/번호 드롭다운 적용) -->
+    <section id="screen-login" class="fade-in max-w-md mx-auto w-full">
+      <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 text-center relative overflow-hidden">
+        <div class="w-16 h-16 rounded-2xl gradient-bg mx-auto flex items-center justify-center text-white text-2xl shadow-lg shadow-indigo-200 mb-4">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-900 mb-2">지역화 전략 Quiz</h2>
+        <p class="text-sm text-slate-500 mb-6">반, 번호, 이름을 선택/입력하고 학습을 시작하세요.</p>
+
+        <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
+          
+          <!-- 반 / 번호 드롭다운 레이아웃 -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">반</label>
+              <div class="relative">
+                <select id="selectClass" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm font-semibold bg-white text-slate-700 cursor-pointer">
+                  <option value="" disabled selected>반 선택</option>
+                  <!-- 1반 ~ 13반 JS로 동적 생성 -->
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">번호</label>
+              <div class="relative">
+                <select id="selectNumber" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm font-semibold bg-white text-slate-700 cursor-pointer">
+                  <option value="" disabled selected>번호 선택</option>
+                  <!-- 1번 ~ 32번 JS로 동적 생성 -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">이름 (Name)</label>
+            <div class="relative">
+              <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-400"></i>
+              <input type="text" id="inputStudentName" required placeholder="예: 홍길동"
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm font-medium">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 rounded-xl gradient-bg text-white font-bold text-base shadow-lg shadow-indigo-200 hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center space-x-2 mt-2">
+            <span>시작하기</span>
+            <i class="fa-solid fa-arrow-right text-sm"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PRACTICE MODE -->
+    <section id="screen-practice" class="fade-in hidden space-y-6">
+      <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden flex flex-col justify-between gap-2">
+        <div class="relative z-10">
+          <div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium mb-2">
+            <i class="fa-solid fa-book-open"></i>
+            <span>연습 학습 모드</span>
+          </div>
+          <h2 class="text-2xl font-bold">12개 주요 도시 지역화 전략 탐색</h2>
+          <p class="text-indigo-100 text-sm mt-1">도시 카드를 클릭하여 지역브랜드, 장소마케팅, 지리적표시제 사례를 학습하세요.</p>
+          <div id="bannerScoreNotice" class="hidden mt-3 p-3 bg-amber-400/90 text-slate-900 rounded-xl font-extrabold text-sm sm:text-base border border-amber-300 shadow-md">
+            🎉 퀴즈 제출 완료! 최종 점수: <span id="bannerScoreValue">0</span>점
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 overflow-x-auto pb-1">
+        <button onclick="filterCities('all')" class="category-filter-btn active-filter px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-indigo-600 text-white shadow-md" data-cat="all">전체 도시 (12)</button>
+        <button onclick="filterCities('지역브랜드')" class="category-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200" data-cat="지역브랜드">🏷️ 지역브랜드</button>
+        <button onclick="filterCities('장소마케팅')" class="category-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200" data-cat="장소마케팅">📍 장소마케팅</button>
+        <button onclick="filterCities('지리적표시제')" class="category-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200" data-cat="지리적표시제">📜 지리적표시제</button>
+      </div>
+
+      <div id="cityGridContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center flex flex-col items-center justify-center space-y-3">
+        <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-bold">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900" id="bottomBannerTitle">학습을 모두 마치셨나요?</h3>
+        <p class="text-xs sm:text-sm text-slate-500 max-w-md" id="bottomBannerSub">무작위 5문제를 풀고 점수 카드를 뽑아 최고 점수에 도전해보세요!</p>
+        <button onclick="startQuizGame()" id="bottomPlayGameBtn" class="px-8 py-3.5 rounded-xl gradient-bg text-white font-bold text-base shadow-lg shadow-indigo-200 hover:opacity-95 active:scale-95 transition-all flex items-center space-x-2">
+          <i class="fa-solid fa-play"></i>
+          <span>게임하기 (퀴즈풀기)</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- CITY DETAIL VIEW -->
+    <section id="screen-detail" class="fade-in hidden max-w-3xl mx-auto w-full">
+      <div class="bg-white rounded-3xl overflow-hidden shadow-xl border border-slate-100">
+        <div class="p-4 sm:p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <button onclick="backToPracticeGrid()" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold hover:bg-slate-100 transition-all flex items-center space-x-1.5 shadow-sm">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>돌아가기</span>
+          </button>
+          <span id="detailCategoryBadge" class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-indigo-100 text-indigo-700">지역브랜드</span>
+        </div>
+
+        <div class="p-6 sm:p-8 space-y-6">
+          <div class="border-b border-slate-100 pb-4">
+            <h2 id="detailCityName" class="text-3xl font-extrabold text-slate-900">서울</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div class="space-y-3">
+              <div class="relative group rounded-2xl overflow-hidden shadow-md aspect-video md:aspect-square bg-slate-100 border border-slate-200">
+                <img id="detailImage" src="" alt="도시 대표 이미지" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  onerror="this.src='https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80'">
+              </div>
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-2">
+                <div class="font-bold text-slate-700"><i class="fa-solid fa-image text-indigo-500 mr-1"></i> 이미지 변경 (직접 추가)</div>
+                <div class="flex gap-1.5">
+                  <input type="text" id="detailImageUrlInput" placeholder="이미지 URL 입력..." class="flex-1 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500">
+                  <button onclick="applyCustomImageUrl()" class="px-2.5 py-1.5 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all shrink-0">적용</button>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-400">
+                  <span>컴퓨터 파일 업로드:</span>
+                  <label class="cursor-pointer text-indigo-600 hover:underline font-bold">[파일 선택]<input type="file" accept="image/*" class="hidden" onchange="handleImageFileUpload(event)"></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <h4 id="detailDescHeader" class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-2">서울의 지역화 전략</h4>
+              <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/80">
+                <p id="detailDescription" class="text-sm sm:text-base text-slate-700 leading-relaxed font-medium">내용이 표시됩니다.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex justify-end">
+            <button onclick="backToPracticeGrid()" class="w-full sm:w-auto px-8 py-3 rounded-xl gradient-bg text-white font-bold text-sm shadow-md hover:opacity-95 transition-all flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-list"></i>
+              <span>12개 도시 목록으로 돌아가기</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ SCREEN -->
+    <section id="screen-quiz" class="fade-in hidden max-w-2xl mx-auto w-full">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-100 space-y-6">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div class="flex items-center space-x-2">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-black text-sm"><i class="fa-solid fa-circle-question"></i></span>
+            <div>
+              <span class="text-xs text-slate-400 font-bold uppercase block">Progress</span>
+              <span id="quizProgressText" class="text-sm font-extrabold text-slate-800">문제 1 / 5</span>
+            </div>
+          </div>
+          <div class="bg-amber-50 border border-amber-200 px-4 py-1.5 rounded-full flex items-center space-x-2">
+            <i class="fa-solid fa-star text-amber-500 text-sm"></i>
+            <span class="text-xs text-amber-800 font-bold">현재 점수:</span>
+            <span id="quizScoreText" class="text-lg font-black text-amber-600">0</span>
+            <span class="text-xs text-amber-800 font-bold">점</span>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <h3 id="quizQuestionText" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug">질문 내용이 표시됩니다.</h3>
+        </div>
+
+        <div id="quizOptionsContainer" class="space-y-3"></div>
+        <div id="quizFeedbackBox" class="hidden p-4 rounded-2xl border text-sm space-y-2"></div>
+
+        <button id="quizNextBtn" onclick="handleNextQuestionBtn()" disabled class="w-full py-3.5 rounded-xl bg-slate-200 text-slate-400 font-bold text-base cursor-not-allowed transition-all flex items-center justify-center space-x-2">
+          <span>다음 문제</span>
+          <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SCORE PICK MODAL -->
+    <div id="modal-bonus" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl space-y-5 fade-in relative">
+        <div class="w-14 h-14 rounded-full bg-amber-100 text-amber-500 mx-auto flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-star"></i></div>
+        <div>
+          <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase">정답입니다! 🎉</span>
+          <h3 class="text-xl font-extrabold text-slate-900 mt-2">점수 카드를 선택하세요!</h3>
+          <p class="text-xs text-slate-500 mt-1">8개의 카드 중 하나를 클릭하면 획득 점수가 합산 또는 곱해집니다.</p>
+        </div>
+        <div id="bonusCardsGrid" class="grid grid-cols-4 gap-2.5 perspective-1000 my-4"></div>
+        <div id="bonusResultMsg" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 font-extrabold text-sm animate-bounce">+10점 획득!</div>
+        <button id="bonusConfirmBtn" onclick="confirmBonusAndContinue()" disabled class="w-full py-3 rounded-xl bg-slate-200 text-slate-400 font-bold text-sm cursor-not-allowed transition-all">점수 적용 후 계속하기</button>
+      </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <section id="screen-result" class="fade-in hidden max-w-lg mx-auto w-full">
+      <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 text-center space-y-6 relative overflow-hidden">
+        <div class="w-20 h-20 rounded-3xl gradient-bg mx-auto flex items-center justify-center text-white text-3xl shadow-xl shadow-indigo-200"><i class="fa-solid fa-trophy"></i></div>
+        <div>
+          <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">지역화 전략 퀴즈 완료</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-2">최종 결과 리포트</h2>
+          <p class="text-xs text-slate-500 mt-1" id="resultStudentInfo">학번: 1반 1번 | 이름: 홍길동</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 p-6 rounded-2xl space-y-1">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">최종 획득 점수</span>
+          <div class="text-5xl font-black gradient-text" id="finalScoreDisplay">0점</div>
+          <p id="finalFeedbackText" class="text-xs font-bold text-indigo-600 mt-2">훌륭합니다!</p>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+            <span>재도전 가능 횟수:</span>
+            <span id="retryCountBadge" class="font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">1회 남아있음</span>
+          </div>
+          <button id="retryBtn" onclick="handleRetryGame()" class="w-full py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-sm shadow-md transition-all flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>재도전하기 (1회 한정 - 새 문제 출제)</span>
+          </button>
+          <button onclick="finishGameAndGoHome()" class="w-full py-3.5 rounded-xl gradient-bg text-white font-bold text-sm shadow-md hover:opacity-95 transition-all flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-check"></i>
+            <span>완료하기 (학습 화면으로 이동)</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+    <div class="max-w-5xl mx-auto px-4"><p>© 2026 지역화 전략 Quiz 웹앱 · 지역브랜드 / 장소마케팅 / 지리적표시제 학습</p></div>
+  </footer>
+
+  <script>
+    const CITY_DATA = {
+      seoul: { name: "서울", category: "지역브랜드", image: "images/seoul.jpg", description: "서울은 'SEOUL, MY SOUL'이라는 새로운 도시 브랜드를 제정하여 도시의 매력과 정체성을 세계에 홍보하고 있습니다." },
+      busan: { name: "부산", category: "지역브랜드", image: "images/busan.jpg", description: "부산은 'Busan is Good(부산이라 좋다)'이라는 도시 브랜드를 도입하여 해양 문화도시로서의 위상을 홍보합니다." },
+      pyeongchang: { name: "평창", category: "지역브랜드", image: "images/pyeongchang.jpg", description: "평창은 'HAPPY 700' 고원 청정 브랜드와 2018 평창 동계올림픽을 연계하여 동계 스포츠 리조트 브랜드를 구축했습니다." },
+      newyork: { name: "뉴욕", category: "지역브랜드", image: "images/newyork.jpg", description: "1970년대 도시 위기를 극복하기 위해 탄생한 'I LOVE NY' 캠페인은 세계에서 가장 유명한 지역 브랜드 사례입니다." },
+      hampyeong: { name: "함평", category: "장소마케팅", image: "images/hampyeong.jpg", description: "농촌 지역에서 '나비'라는 청정 자원을 테마로 '함평 나비축제'를 개최하여 대규모 관광객 유치에 성공했습니다." },
+      gwangju: { name: "광주", category: "장소마케팅", image: "images/gwangju.jpg", description: "경기도 광주는 유네스코 세계문화유산인 남한산성의 가치를 알리는 '남한산성문화제'를 개최합니다." },
+      hwacheon: { name: "화천", category: "장소마케팅", image: "images/hwacheon.jpg", description: "인구 2만 명의 소도시 화천은 겨울철 '산천어축제'를 통해 매년 100만 명 이상의 관광객을 유치합니다." },
+      boryeong: { name: "보령", category: "장소마케팅", image: "images/boryeong.jpg", description: "보령 머드축제는 청정 갯벌의 머드를 활용해 세계적인 체험형 축제를 만들었습니다." },
+      boseong: { name: "보성", category: "지리적표시제", image: "images/boseong.jpg", description: "'보성 녹차'는 2002년 대한민국 농산물 지리적표시제 등록 제1호로 지정되었습니다." },
+      icheon: { name: "이천", category: "지리적표시제", image: "images/icheon.jpg", description: "'임금님표 이천쌀'은 토양과 수질, 기후 조건을 바탕으로 등록된 지리적표시제 특산품입니다." },
+      hoengseong: { name: "횡성", category: "지리적표시제", image: "images/hoengseong.jpg", description: "'횡성 한우'는 지리적 요인과 엄격한 품질인증 시스템이 결합하여 대한민국 대표 한우 브랜드가 되었습니다." },
+      sunchang: { name: "순창", category: "지리적표시제", image: "images/sunchang.jpg", description: "'순창 전통 고추장'은 발효 기후와 지하수 자원, 전통 방식을 기반으로 지리적표시제에 등록되어 있습니다." }
+    };
+
+    const QUIZ_DATA = [
+      { id: 1, question: "2002년 대한민국 농산물 지리적표시제 등록 '제1호'로 지정되어 품질을 법적으로 인정받은 보성의 대표 특산품은?", options: ["보성 꼬막", "보성 녹차", "보성 키위", "보성 쌀"], answer: 1, explanation: "보성 녹차는 2002년 농산물 지리적표시 등록 제1호 특산품입니다." },
+      { id: 2, question: "경기도 광주는 유네스코 세계문화유산인 이 유적지의 역사적 가치를 알리는 문화제를 개최합니다. 이 문화유산은?", options: ["수원화성", "남한산성", "북한산성", "행주산성"], answer: 1, explanation: "경기도 광주는 남한산성을 테마로 '남한산성문화제' 장소마케팅을 개최합니다." },
+      { id: 3, question: "서울시가 글로벌 도시 정체성을 알리기 위해 선포한 새로운 공식 도시 브랜드 슬로건은?", options: ["Hi Seoul", "I·SEOUL·U", "SEOUL, MY SOUL", "Dynamic Seoul"], answer: 2, explanation: "서울시의 공식 신규 도시 브랜드 슬로건은 'SEOUL, MY SOUL'입니다." },
+      { id: 4, question: "친환경 생태 자원인 '나비'를 테마로 축제를 열어 대성공을 거둔 전남의 장소마케팅 성공 도시는?", options: ["함평", "화천", "보령", "순창"], answer: 0, explanation: "함평군은 '함평 나비축제'로 장소 가치를 극대화했습니다." },
+      { id: 5, question: "특유의 발효 기후와 깨끗한 수질을 인정받아 지리적표시제에 등록된 순창의 대표 전통 장류 특산품은?", options: ["순창 전통 고추장", "순창 녹차", "순창 임금님표 쌀", "순창 명품 한우"], answer: 0, explanation: "순창은 고유의 발효 기후 조건으로 만든 '순창 전통 고추장'으로 지리적표시제에 등록되어 있습니다." },
+      { id: 6, question: "1970년대 도시 위기 극복을 위해 붉은 하트 로고로 제작된 뉴욕의 유명 지역 브랜드 캠페인은?", options: ["NYC FIRST", "I LOVE NY", "BIG APPLE", "ALWAYS NEW YORK"], answer: 1, explanation: "'I LOVE NY'은 전 세계적으로 가장 유명한 뉴욕의 지역 브랜드 캠페인입니다." },
+      { id: 7, question: "겨울철 얼음낚시 체험과 이 물고기를 활용한 축제로 매년 100만 명 이상을 유치하는 화천의 축제는?", options: ["화천 산천어축제", "화천 빙어축제", "화천 송어축제", "화천 은어축제"], answer: 0, explanation: "화천 산천어축제는 세계 4대 겨울 축제로 꼽히는 대표적인 장소마케팅 사례입니다." },
+      { id: 8, question: "'임금님표'라는 지리적표시제 브랜드로 쌀의 명성을 높인 도시는 어디일까요?", options: ["이천", "횡성", "보성", "평창"], answer: 0, explanation: "이천은 '임금님표 이천쌀' 지리적표시제로 유명합니다." },
+      { id: 9, question: "청정 갯벌 자원을 활용해 세계적인 머드축제를 성공시킨 충남의 장소마케팅 도시는?", options: ["보령", "태안", "서천", "아산"], answer: 0, explanation: "보령시는 머드축제 성공에 힘입어 머드 화장품 등 산업을 창출했습니다." },
+      { id: 10, question: "엄격한 품질인증 시스템으로 대한민국 대표 명품 브랜드가 된 횡성의 지리적표시제 축산물은?", options: ["횡성 흑돼지", "횡성 한우", "횡성 토종닭", "횡성 젖소"], answer: 1, explanation: "횡성 한우는 대표적인 지리적표시제 명품 한우 브랜드입니다." },
+      { id: 11, question: "동북아 중심 해양 문화도시 정체성을 알리기 위해 부산시가 제정한 슬로건은?", options: ["Busan is First", "Busan is Good", "Busan is Great", "Busan is Smart"], answer: 1, explanation: "부산의 공식 도시 브랜드 슬로건은 'Busan is Good'입니다." },
+      { id: 12, question: "평창이 고원 청정 브랜드 정체성을 강조하기 위해 사용한 숫자 브랜드 명칭과 연계된 국제 이벤트는?", options: ["HAPPY 700 - 2018 평창 동계올림픽", "HAPPY 500 - 2014 평창 동계올림픽", "CLEAN 700 - 2020 평창 동계올림픽", "GREEN 800 - 2010 평창 동계올림픽"], answer: 0, explanation: "평창은 'HAPPY 700' 고원 청정 브랜드와 2018 동계올림픽을 연계하였습니다." }
+    ];
+
+    let currentUser = { studentId: "", studentName: "" };
+    let currentSelectedCityKey = null;
+    let currentQuizPool = [];
+    let usedQuestionIds = [];
+    let quizCurrentIndex = 0;
+    let quizScore = 0;
+    let retryCount = 0;
+    let isQuizCompleted = false;
+    let finalQuizScore = 0;
+    const BONUS_OPTIONS = [+3, +5, +10, +15, +20, "x2", "x2", "x2"];
+
+    // 반 (1~13반) 및 번호 (1~32번) 드롭다운 옵션 자동 생성
+    function initDropdowns() {
+      const classSelect = document.getElementById('selectClass');
+      const numberSelect = document.getElementById('selectNumber');
+
+      if (classSelect) {
+        for (let i = 1; i <= 13; i++) {
+          const opt = document.createElement('option');
+          opt.value = `${i}반`;
+          opt.textContent = `${i}반`;
+          classSelect.appendChild(opt);
+        }
+      }
+
+      if (numberSelect) {
+        for (let i = 1; i <= 32; i++) {
+          const opt = document.createElement('option');
+          opt.value = `${i}번`;
+          opt.textContent = `${i}번`;
+          numberSelect.appendChild(opt);
+        }
+      }
+    }
+
+    function showScreen(screenId) {
+      const screens = ['screen-login', 'screen-practice', 'screen-detail', 'screen-quiz', 'screen-result'];
+      screens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', id !== screenId);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 로그인 처리 (반 + 번호 결합)
+    function handleLogin(event) {
+      event.preventDefault();
+      const classVal = document.getElementById('selectClass').value;
+      const numberVal = document.getElementById('selectNumber').value;
+      const nameInput = document.getElementById('inputStudentName').value.trim();
+
+      if (!classVal || !numberVal || !nameInput) {
+        return alert('반, 번호, 이름을 모두 선택 및 입력해주세요.');
+      }
+
+      // studentId 자리에 "1반 5번" 형태로 조합하여 수집
+      currentUser = { studentId: `${classVal} ${numberVal}`, studentName: nameInput };
+      isQuizCompleted = false;
+      finalQuizScore = 0;
+      usedQuestionIds = [];
+
+      document.getElementById('headerStudentId').innerText = currentUser.studentId;
+      document.getElementById('headerStudentName').innerText = currentUser.studentName;
+      document.getElementById('studentHeaderBadge').classList.remove('hidden');
+
+      updatePlayGameButtons();
+      renderCityGrid('all');
+      showScreen('screen-practice');
+    }
+
+    function handleHeaderLogoClick() {
+      showScreen(currentUser.studentId ? 'screen-practice' : 'screen-login');
+    }
+
+    function renderCityGrid(categoryFilter = 'all') {
+      const container = document.getElementById('cityGridContainer');
+      container.innerHTML = '';
+
+      Object.keys(CITY_DATA).forEach(key => {
+        const city = CITY_DATA[key];
+        if (categoryFilter !== 'all' && city.category !== categoryFilter) return;
+
+        let categoryColorClass = "bg-indigo-100 text-indigo-700";
+        if (city.category === "장소마케팅") categoryColorClass = "bg-amber-100 text-amber-800";
+        if (city.category === "지리적표시제") categoryColorClass = "bg-emerald-100 text-emerald-800";
+
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-indigo-400 hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col justify-between";
+        card.onclick = () => openCityDetail(key);
+        card.innerHTML = `
+          <div>
+            <div class="relative aspect-video overflow-hidden bg-slate-100">
+              <img src="${city.image}" alt="${city.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80'">
+              <span class="absolute top-2 right-2 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${categoryColorClass}">${city.category}</span>
+            </div>
+            <div class="p-4"><h3 class="font-extrabold text-slate-900 text-lg group-hover:text-indigo-600 transition-colors">${city.name}</h3><p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mt-1">${city.description}</p></div>
+          </div>
+          <div class="px-4 pb-4 pt-1 flex items-center justify-between text-xs text-indigo-600 font-bold border-t border-slate-50 mt-2"><span>상세 보기</span><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterCities(category) {
+      document.querySelectorAll('.category-filter-btn').forEach(btn => {
+        btn.className = (btn.dataset.cat === category)
+          ? "category-filter-btn active-filter px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-indigo-600 text-white shadow-md"
+          : "category-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200";
+      });
+      renderCityGrid(category);
+    }
+
+    function openCityDetail(cityKey) {
+      currentSelectedCityKey = cityKey;
+      const city = CITY_DATA[cityKey];
+      document.getElementById('detailCityName').innerText = city.name;
+      document.getElementById('detailCategoryBadge').innerText = city.category;
+      document.getElementById('detailDescHeader').innerText = `${city.name}의 지역화 전략`;
+      document.getElementById('detailDescription').innerText = city.description;
+      document.getElementById('detailImage').src = city.image;
+      document.getElementById('detailImageUrlInput').value = '';
+      showScreen('screen-detail');
+    }
+
+    function backToPracticeGrid() { showScreen('screen-practice'); }
+
+    function applyCustomImageUrl() {
+      const urlInput = document.getElementById('detailImageUrlInput').value.trim();
+      if (!urlInput) return alert('이미지 URL을 입력해주세요.');
+      if (currentSelectedCityKey && CITY_DATA[currentSelectedCityKey]) {
+        CITY_DATA[currentSelectedCityKey].image = urlInput;
+        document.getElementById('detailImage').src = urlInput;
+        renderCityGrid('all');
+        alert('이미지가 반영되었습니다!');
+      }
+    }
+
+    function handleImageFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          if (currentSelectedCityKey && CITY_DATA[currentSelectedCityKey]) {
+            CITY_DATA[currentSelectedCityKey].image = e.target.result;
+            document.getElementById('detailImage').src = e.target.result;
+            renderCityGrid('all');
+            alert('업로드한 이미지가 적용되었습니다!');
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function startQuizGame() {
+      if (isQuizCompleted) return alert(`이미 퀴즈를 완료하였습니다. (최종 점수: ${finalQuizScore}점)`);
+
+      let availableQuestions = QUIZ_DATA.filter(q => !usedQuestionIds.includes(q.id));
+      if (availableQuestions.length < 5) availableQuestions = QUIZ_DATA;
+
+      const shuffled = [...availableQuestions].sort(() => 0.5 - Math.random());
+      currentQuizPool = shuffled.slice(0, 5);
+      currentQuizPool.forEach(q => usedQuestionIds.push(q.id));
+
+      quizCurrentIndex = 0;
+      quizScore = 0;
+      showScreen('screen-quiz');
+      loadQuizQuestion();
+    }
+
+    function loadQuizQuestion() {
+      const q = currentQuizPool[quizCurrentIndex];
+      document.getElementById('quizProgressText').innerText = `문제 ${quizCurrentIndex + 1} / ${currentQuizPool.length}`;
+      document.getElementById('quizScoreText').innerText = quizScore;
+      document.getElementById('quizQuestionText').innerText = `Q${quizCurrentIndex + 1}. ${q.question}`;
+
+      const optionsContainer = document.getElementById('quizOptionsContainer');
+      optionsContainer.innerHTML = '';
+      document.getElementById('quizFeedbackBox').className = "hidden p-4 rounded-2xl border text-sm space-y-2";
+
+      const nextBtn = document.getElementById('quizNextBtn');
+      nextBtn.disabled = true;
+      nextBtn.className = "w-full py-3.5 rounded-xl bg-slate-200 text-slate-400 font-bold text-base cursor-not-allowed transition-all flex items-center justify-center space-x-2";
+
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "quiz-opt-btn w-full p-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 transition-all text-left font-semibold text-slate-800 flex items-center justify-between group";
+        btn.onclick = () => selectQuizOption(idx);
+        btn.innerHTML = `<div class="flex items-center space-x-3"><span class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center text-xs font-bold transition-colors">${idx + 1}</span><span class="text-sm sm:text-base">${optText}</span></div><i class="fa-solid fa-circle-check opacity-0 group-hover:opacity-100 text-indigo-600 transition-opacity"></i>`;
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function selectQuizOption(selectedIndex) {
+      const q = currentQuizPool[quizCurrentIndex];
+      const isCorrect = (selectedIndex === q.answer);
+
+      document.querySelectorAll('.quiz-opt-btn').forEach((btn, idx) => {
+        btn.onclick = null;
+        if (idx === q.answer) btn.className = "quiz-opt-btn w-full p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 font-bold text-emerald-900 flex items-center justify-between";
+        else if (idx === selectedIndex && !isCorrect) btn.className = "quiz-opt-btn w-full p-4 rounded-2xl border-2 border-red-400 bg-red-50 font-bold text-red-900 flex items-center justify-between";
+        else btn.className = "quiz-opt-btn w-full p-4 rounded-2xl border-2 border-slate-100 opacity-50 text-slate-400 flex items-center justify-between";
+      });
+
+      const feedbackBox = document.getElementById('quizFeedbackBox');
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        feedbackBox.className = "p-4 rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-900 text-sm space-y-1";
+        feedbackBox.innerHTML = `<div class="font-extrabold text-emerald-700 flex items-center space-x-1"><i class="fa-solid fa-circle-check"></i><span>정답입니다! 점수 카드를 뽑을 수 있습니다.</span></div><p class="text-xs text-emerald-800">${q.explanation}</p>`;
+        setTimeout(() => openBonusModal(), 600);
+      } else {
+        feedbackBox.className = "p-4 rounded-2xl border border-red-200 bg-red-50 text-red-900 text-sm space-y-1";
+        feedbackBox.innerHTML = `<div class="font-extrabold text-red-700 flex items-center space-x-1"><i class="fa-solid fa-circle-xmark"></i><span>아쉽게도 오답입니다. (획득 점수: 0점)</span></div><p class="text-xs text-red-800">정답: <strong>${q.options[q.answer]}</strong></p><p class="text-xs text-slate-600 mt-1">${q.explanation}</p>`;
+        enableNextButton();
+      }
+    }
+
+    function enableNextButton() {
+      const nextBtn = document.getElementById('quizNextBtn');
+      nextBtn.disabled = false;
+      nextBtn.className = "w-full py-3.5 rounded-xl gradient-bg text-white font-bold text-base shadow-lg shadow-indigo-200 hover:opacity-95 active:scale-95 transition-all flex items-center justify-center space-x-2 cursor-pointer";
+    }
+
+    function handleNextQuestionBtn() {
+      if (quizCurrentIndex < currentQuizPool.length - 1) {
+        quizCurrentIndex++;
+        loadQuizQuestion();
+      } else {
+        showQuizResult();
+      }
+    }
+
+    function openBonusModal() {
+      const modal = document.getElementById('modal-bonus');
+      const grid = document.getElementById('bonusCardsGrid');
+      document.getElementById('bonusResultMsg').classList.add('hidden');
+      const confirmBtn = document.getElementById('bonusConfirmBtn');
+      confirmBtn.disabled = true;
+      confirmBtn.className = "w-full py-3 rounded-xl bg-slate-200 text-slate-400 font-bold text-sm cursor-not-allowed transition-all";
+
+      grid.innerHTML = '';
+      const shuffledBonus = [...BONUS_OPTIONS].sort(() => 0.5 - Math.random());
+
+      shuffledBonus.forEach((bonusVal) => {
+        const cardWrapper = document.createElement('div');
+        cardWrapper.className = "h-24 cursor-pointer perspective-1000";
+        const cardInner = document.createElement('div');
+        cardInner.className = "card-inner shadow-md rounded-xl";
+
+        const cardFront = document.createElement('div');
+        cardFront.className = "card-front gradient-bg flex flex-col items-center justify-center text-white border-2 border-white/20";
+        cardFront.innerHTML = `<i class="fa-solid fa-star text-lg mb-1"></i><span class="text-[10px] font-black uppercase">PICK</span>`;
+
+        const cardBack = document.createElement('div');
+        cardBack.className = "card-back bg-amber-400 text-slate-900 font-black flex flex-col items-center justify-center rounded-xl border-2 border-amber-300 text-base shadow-inner";
+        cardBack.innerHTML = `<span class="text-xs text-amber-900 font-bold">점수</span><span>${typeof bonusVal === 'number' ? '+' + bonusVal : 'X2'}</span>`;
+
+        cardInner.appendChild(cardFront);
+        cardInner.appendChild(cardBack);
+        cardWrapper.appendChild(cardInner);
+        cardWrapper.onclick = () => pickBonusCard(cardInner, bonusVal);
+        grid.appendChild(cardWrapper);
+      });
+
+      modal.classList.remove('hidden');
+    }
+
+    function pickBonusCard(cardInner, bonusVal) {
+      document.querySelectorAll('#bonusCardsGrid .card-inner').forEach(c => c.parentElement.onclick = null);
+      cardInner.classList.add('card-flipped');
+
+      let appliedText = "";
+      if (typeof bonusVal === 'number') {
+        quizScore += bonusVal;
+        appliedText = `+${bonusVal}점을 획득하셨습니다!`;
+      } else if (bonusVal === 'x2') {
+        quizScore = quizScore === 0 ? 20 : quizScore * 2;
+        appliedText = `X2 찬스! 점수가 2배로 증가했습니다!`;
+      }
+
+      document.getElementById('quizScoreText').innerText = quizScore;
+      const resultMsg = document.getElementById('bonusResultMsg');
+      resultMsg.innerText = appliedText;
+      resultMsg.classList.remove('hidden');
+
+      const confirmBtn = document.getElementById('bonusConfirmBtn');
+      confirmBtn.disabled = false;
+      confirmBtn.className = "w-full py-3 rounded-xl gradient-bg text-white font-bold text-sm shadow-md hover:opacity-95 transition-all cursor-pointer";
+    }
+
+    function confirmBonusAndContinue() {
+      document.getElementById('modal-bonus').classList.add('hidden');
+      enableNextButton();
+    }
+
+    function showQuizResult() {
+      document.getElementById('resultStudentInfo').innerText = `소속: ${currentUser.studentId} | 이름: ${currentUser.studentName}`;
+      document.getElementById('finalScoreDisplay').innerText = `${quizScore}점`;
+
+      const feedback = document.getElementById('finalFeedbackText');
+      if (quizScore >= 50) feedback.innerText = "🎉 대단합니다! 완벽히 이해하셨군요!";
+      else if (quizScore >= 20) feedback.innerText = "👍 좋은 결과입니다! 부족한 개념을 복습해보세요.";
+      else feedback.innerText = "💪 조금 더 연습이 필요합니다.";
+
+      updateRetryBadge();
+      showScreen('screen-result');
+    }
+
+    function updateRetryBadge() {
+      const badge = document.getElementById('retryCountBadge');
+      const retryBtn = document.getElementById('retryBtn');
+
+      if (retryCount >= 1) {
+        badge.innerText = "0회 (재도전 완료됨)";
+        badge.className = "font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded border border-slate-200";
+        retryBtn.disabled = true;
+        retryBtn.className = "w-full py-3.5 rounded-xl bg-slate-200 text-slate-400 font-bold text-sm cursor-not-allowed transition-all flex items-center justify-center space-x-2";
+      } else {
+        badge.innerText = "1회 남아있음";
+        badge.className = "font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100";
+        retryBtn.disabled = false;
+        retryBtn.className = "w-full py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-sm shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer";
+      }
+    }
+
+    function handleRetryGame() {
+      if (retryCount >= 1) return alert("재도전 기회(1회)를 이미 사용하셨습니다.");
+      retryCount++;
+      alert("새로운 문제로 재도전을 시작합니다! (재도전 기회 1회 차감)");
+      startQuizGame();
+    }
+
+    // 퀴즈 완료 시 구글 시트 자동 전송 및 LocalStorage 기록
+    function finishGameAndGoHome() {
+      isQuizCompleted = true;
+      finalQuizScore = quizScore;
+      
+      // 구글 앱스 스크립트 웹 앱 URL 입력 시 자동 연동
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbwYADtUhL9w1tz8mFqWjfdouv8tuEkYx6Dv5KxSyc03H2OCNK3JTkY-FTlnAr5VXon5/exec';
+      
+      if (scriptURL && scriptURL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+        fetch(scriptURL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            studentId: currentUser.studentId, // 예: "1반 5번"
+            studentName: currentUser.studentName,
+            score: finalQuizScore
+          })
+        }).catch(err => console.error('구글 시트 전송 오류:', err));
+      }
+
+      saveResultToLocalStorage();
+      updatePlayGameButtons();
+      showScreen('screen-practice');
+    }
+
+    function saveResultToLocalStorage() {
+      const records = JSON.parse(localStorage.getItem('quiz_student_results') || '[]');
+      const newRecord = {
+        studentId: currentUser.studentId,
+        studentName: currentUser.studentName,
+        score: finalQuizScore,
+        date: new Date().toLocaleString('ko-KR')
+      };
+
+      const existingIdx = records.findIndex(r => r.studentId === currentUser.studentId && r.studentName === currentUser.studentName);
+      if (existingIdx >= 0) records[existingIdx] = newRecord;
+      else records.push(newRecord);
+
+      localStorage.setItem('quiz_student_results', JSON.stringify(records));
+    }
+
+    function updatePlayGameButtons() {
+      const bottomBtn = document.getElementById('bottomPlayGameBtn');
+      const bannerNotice = document.getElementById('bannerScoreNotice');
+      const bannerVal = document.getElementById('bannerScoreValue');
+      const scoreBadge = document.getElementById('headerScoreBadge');
+      const bottomTitle = document.getElementById('bottomBannerTitle');
+      const bottomSub = document.getElementById('bottomBannerSub');
+
+      if (isQuizCompleted) {
+        if (scoreBadge) {
+          scoreBadge.innerText = `퀴즈 완료 (${finalQuizScore}점)`;
+          scoreBadge.classList.remove('hidden');
+        }
+        if (bannerNotice && bannerVal) {
+          bannerVal.innerText = finalQuizScore;
+          bannerNotice.classList.remove('hidden');
+        }
+        if (bottomTitle) bottomTitle.innerText = "퀴즈 완수를 축하합니다!";
+        if (bottomSub) bottomSub.innerText = `최종 점수 ${finalQuizScore}점으로 제출이 완료되었습니다.`;
+
+        if (bottomBtn) {
+          bottomBtn.className = "px-8 py-3.5 rounded-xl bg-slate-400 text-white font-bold text-base shadow-md cursor-not-allowed opacity-80 transition-all flex items-center space-x-2";
+          bottomBtn.innerHTML = `<i class="fa-solid fa-lock"></i><span>퀴즈 완료됨 (${finalQuizScore}점)</span>`;
+        }
+      } else {
+        if (scoreBadge) scoreBadge.classList.add('hidden');
+        if (bannerNotice) bannerNotice.classList.add('hidden');
+        if (bottomTitle) bottomTitle.innerText = "학습을 모두 마치셨나요?";
+        if (bottomSub) bottomSub.innerText = "무작위 5문제를 풀고 점수 카드를 뽑아 최고 점수에 도전해보세요!";
+
+        if (bottomBtn) {
+          bottomBtn.className = "px-8 py-3.5 rounded-xl gradient-bg text-white font-bold text-base shadow-lg shadow-indigo-200 hover:opacity-95 active:scale-95 transition-all flex items-center space-x-2";
+          bottomBtn.innerHTML = '<i class="fa-solid fa-play"></i><span>게임하기 (퀴즈풀기)</span>';
+        }
+      }
+    }
+
+    window.onload = function() {
+      initDropdowns(); // 반/번호 드롭다운 동적 생성
+      showScreen('screen-login');
+    };
+  </script>
+</body>
+</html>
