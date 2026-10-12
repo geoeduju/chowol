@@ -25,7 +25,7 @@
 
   <!-- Header -->
   <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+    <div class="max-w-5xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="handleHeaderLogoClick()">
         <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center text-white shadow-md shadow-indigo-200">
           <i class="fa-solid fa-map-location-dot text-lg"></i>
@@ -46,11 +46,11 @@
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-4 py-6 flex-1 w-full flex flex-col justify-center">
+  <main class="max-w-5xl mx-auto px-4 lg:px-8 py-8 flex-1 w-full flex flex-col justify-center">
 
     <!-- LOGIN -->
-    <section id="screen-login" class="fade-in max-w-md mx-auto w-full">
-      <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 text-center relative overflow-hidden">
+    <section id="screen-login" class="fade-in max-w-md mx-auto w-full my-auto">
+      <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-100 text-center relative overflow-hidden">
         <div class="w-16 h-16 rounded-2xl gradient-bg mx-auto flex items-center justify-center text-white text-2xl shadow-lg shadow-indigo-200 mb-4">
           <i class="fa-solid fa-graduation-cap"></i>
         </div>
@@ -81,7 +81,7 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full py-3.5 rounded-xl gradient-bg text-white font-bold text-base shadow-lg shadow-indigo-200 hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center space-x-2 mt-2">
+          <button type="submit" class="w-full py-4 px-6 rounded-2xl gradient-bg text-white font-bold text-base shadow-lg shadow-indigo-200 hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-3 mt-6">
             <span>시작하기</span>
             <i class="fa-solid fa-arrow-right text-sm"></i>
           </button>
@@ -111,7 +111,7 @@
         <button onclick="filterCities('지리적표시제')" class="category-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200" data-cat="지리적표시제">📜 지리적표시제</button>
       </div>
 
-      <div id="cityGridContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+      <div id="cityGridContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5"></div>
 
       <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center flex flex-col items-center justify-center space-y-3">
         <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-trophy"></i></div>
@@ -126,11 +126,9 @@
     <!-- DETAIL -->
     <section id="screen-detail" class="fade-in hidden max-w-3xl mx-auto w-full">
       <div class="bg-white rounded-3xl overflow-hidden shadow-xl border border-slate-100">
-        <div class="p-4 sm:p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-          <button onclick="backToPracticeGrid()" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold hover:bg-slate-100 transition-all flex items-center space-x-1.5 shadow-sm">
-            <i class="fa-solid fa-arrow-left"></i><span>돌아가기</span>
-          </button>
-          <span id="detailCategoryBadge" class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-indigo-100 text-indigo-700">지역브랜드</span>
+        <!-- 상단 헤더: 돌아가기 버튼 제거, 카테고리 배지만 깔끔히 배치 -->
+        <div class="p-4 sm:p-5 bg-slate-50 border-b border-slate-100 flex items-center justify-end">
+          <span id="detailCategoryBadge" class="px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase bg-indigo-100 text-indigo-700">지역브랜드</span>
         </div>
 
         <div class="p-6 sm:p-8 space-y-6">
@@ -138,25 +136,27 @@
             <h2 id="detailCityName" class="text-3xl font-extrabold text-slate-900">서울</h2>
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-            <div class="rounded-2xl overflow-hidden shadow-md aspect-video md:aspect-auto bg-slate-100 border border-slate-200 relative min-h-[220px]">
-              <img id="detailImage" src="" alt="도시 대표 이미지" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80'">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
+            <!-- 이미지 영역: 모든 해상도 및 장소마케팅 세로 사진 지원 -->
+            <div class="rounded-2xl overflow-hidden shadow-sm bg-slate-100 border border-slate-200 aspect-[4/3] md:aspect-auto md:h-full relative min-h-[250px]">
+              <img id="detailImage" src="" alt="도시 대표 이미지" class="w-full h-full object-cover object-center" onerror="this.src='https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80'">
             </div>
             
-            <div class="flex flex-col justify-between space-y-4">
-              <div>
-                <h4 id="detailDescHeader" class="text-xs font-extrabold text-indigo-600 uppercase tracking-wider mb-2 flex items-center">
+            <!-- 설명 영역: 순창 스타일의 넉넉하고 쾌적한 여백 적용 -->
+            <div class="flex flex-col justify-between h-full space-y-4">
+              <div class="flex flex-col h-full">
+                <h4 id="detailDescHeader" class="text-xs font-extrabold text-indigo-600 uppercase tracking-wider mb-2.5 flex items-center">
                   <i class="fa-solid fa-circle-info mr-1.5"></i><span>핵심 지역화 전략 분석</span>
                 </h4>
-                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 h-full">
-                  <p id="detailDescription" class="text-sm text-slate-700 leading-relaxed font-medium whitespace-pre-line">내용이 표시됩니다.</p>
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 flex-1 flex flex-col justify-center min-h-[200px]">
+                  <p id="detailDescription" class="text-sm sm:text-base text-slate-700 leading-relaxed font-medium whitespace-pre-line">내용이 표시됩니다.</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="pt-4 border-t border-slate-100 flex justify-end">
-            <button onclick="backToPracticeGrid()" class="w-full sm:w-auto px-8 py-3 rounded-xl gradient-bg text-white font-bold text-sm shadow-md hover:opacity-95 transition-all flex items-center justify-center space-x-2">
+            <button onclick="backToPracticeGrid()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl gradient-bg text-white font-bold text-sm shadow-md hover:opacity-95 transition-all flex items-center justify-center space-x-2">
               <i class="fa-solid fa-list"></i><span>12개 도시 목록으로 돌아가기</span>
             </button>
           </div>
@@ -239,7 +239,6 @@
   </footer>
 
   <script>
-    // 도시별 데이터 (상대 경로 복원)
     const CITY_DATA = {
       seoul: { 
         name: "서울", 
@@ -341,6 +340,16 @@
     let finalQuizScore = 0;
     const BONUS_OPTIONS = [+3, +5, +10, +15, +20, "x2", "x2", "x2"];
 
+    // 피셔-예이츠 셔플 알고리즘 (강력한 완벽 무작위 섞기)
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
     function initDropdowns() {
       const classSelect = document.getElementById('selectClass');
       const numberSelect = document.getElementById('selectNumber');
@@ -413,8 +422,8 @@
         card.onclick = () => openCityDetail(key);
         card.innerHTML = `
           <div>
-            <div class="relative aspect-video overflow-hidden bg-slate-100">
-              <img src="${city.image}" alt="${city.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80'">
+            <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
+              <img src="${city.image}" alt="${city.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80'">
               <span class="absolute top-2 right-2 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${categoryColorClass}">${city.category}</span>
             </div>
             <div class="p-4">
@@ -455,7 +464,7 @@
       let availableQuestions = QUIZ_DATA.filter(q => !usedQuestionIds.includes(q.id));
       if (availableQuestions.length < 5) availableQuestions = QUIZ_DATA;
 
-      const shuffled = [...availableQuestions].sort(() => 0.5 - Math.random());
+      const shuffled = shuffleArray(availableQuestions);
       currentQuizPool = shuffled.slice(0, 5);
       currentQuizPool.forEach(q => usedQuestionIds.push(q.id));
 
@@ -548,7 +557,8 @@
       confirmBtn.className = "w-full py-3 rounded-xl bg-slate-200 text-slate-400 font-bold text-sm cursor-not-allowed transition-all";
 
       grid.innerHTML = '';
-      const shuffledBonus = [...BONUS_OPTIONS].sort(() => 0.5 - Math.random());
+      // 피셔-예이츠 셔플 알고리즘 적용
+      const shuffledBonus = shuffleArray(BONUS_OPTIONS);
 
       shuffledBonus.forEach((bonusVal) => {
         const cardWrapper = document.createElement('div');
