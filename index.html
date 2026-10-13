@@ -241,9 +241,10 @@
         <div>
           <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase">정답입니다! 🎉</span>
           <h3 class="text-xl font-extrabold text-slate-900 mt-2">점수 카드를 선택하세요!</h3>
-          <p class="text-xs text-slate-500 mt-1">8개의 카드 중 하나를 클릭하면 획득 점수가 합산 또는 곱해집니다.</p>
+          <p class="text-xs text-slate-500 mt-1">6개의 카드 중 하나를 클릭하면 획득 점수가 합산 또는 곱해집니다.</p>
         </div>
-        <div id="bonusCardsGrid" class="grid grid-cols-4 gap-2.5 perspective-1000 my-4"></div>
+        <!-- 6개 카드를 2줄 3열로 정돈하기 위해 grid-cols-3 적용 -->
+        <div id="bonusCardsGrid" class="grid grid-cols-3 gap-3 perspective-1000 my-4"></div>
         <div id="bonusResultMsg" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 font-extrabold text-sm animate-bounce">+10점 획득!</div>
         <button id="bonusConfirmBtn" onclick="confirmBonusAndContinue()" disabled class="w-full py-3 rounded-xl bg-slate-200 text-slate-400 font-bold text-sm cursor-not-allowed transition-all">점수 적용 후 계속하기</button>
       </div>
@@ -387,7 +388,9 @@
     let retryCount = 0;
     let isQuizCompleted = false;
     let finalQuizScore = 0;
-    const BONUS_OPTIONS = [+3, +5, +10, +15, +20, "x2", "x2", "x2"];
+
+    // +3점, +30점을 제외하고 총 6개의 깔끔한 점수 카드로 구성
+    const BONUS_OPTIONS = [+5, +8, +10, +15, +20, "x2"];
 
     function shuffleArray(array) {
       const arr = [...array];
